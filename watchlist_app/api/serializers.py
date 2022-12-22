@@ -1,27 +1,43 @@
 from rest_framework import serializers
-from watchlist_app.models import Movie
+from watchlist_app.models import Watchlist, StreamPlatform
 
 
-class MovieSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Movie
+
+
+class WatchListSerializer(serializers.ModelSerializer):
+    
+     class Meta:
+        model = Watchlist
         fields = "__all__"
         #fields = ['id', 'name', 'description']
         #exclude = ['name']
-        
-    #     #Object level validation
-    def validate(self, data):
-        if data['name'] == data['description']:
-            raise serializers.ValidationError('Movie name cannot be the same as description')
-        else:
-            return data    
 
-   # Field level validation
-    def validate_name(self, value):
-        if len(value) < 2 :
-            raise serializers.ValidationError('Name is too short')
-        else:
-            return value
+# HyperlinkedModelSerializer is use the link of the model instead of pk
+
+class StreamPlatformSerializer(serializers.HyperlinkedModelSerializer): 
+    """This is an example of nester serializer. Here watchlist is the related name we defined in models.py
+    Now StreamPlatformSerializer can have all the shows in the WatchListSerializer"""
+    watchlist = WatchListSerializer(many=True, read_only=True)
+    class Meta:
+        model = StreamPlatform
+        fields = "__all__"
+
+#     def get_len_name(self, obj):
+#         return len(obj.name)
+
+#     #Object level validation
+#     def validate(self, data):
+#         if data['name'] == data['description']:
+#             raise serializers.ValidationError('Movie name cannot be the same as description')
+#         else:
+#             return data    
+
+#    # Field level validation
+#     def validate_name(self, value):
+#         if len(value) < 2 :
+#             raise serializers.ValidationError('Name is too short')
+#         else:
+#             return value
 
 #def name_length(value):
 #     if len(value) < 2 :
